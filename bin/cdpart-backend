@@ -1,0 +1,34 @@
+#!perl
+
+# misalnya gw ada di /media/1/mv/en/c/celine-dion
+# gw pengen berpindah dengan cepat ke /media/1/mv/fr/c/celine-dion
+# cdpart fr
+# dia akan pertama mencari /media/1/mv/en/c/fr
+# gak ada, maka ke /media/1/mv/en/fr/celine-dion
+# gak ada, maka ke /media/1/mv/fr/c/celine-dion
+
+
+# to be called via 'cdmv', which is a shell alias: alias cdmv='cd
+# `cdmv-backend`'
+
+my $cwd = $ENV{PWD} || do { require Cwd; Cwd::cwd() };
+
+my %counterparts = (
+    'mv' => 'm',
+    'm'  => 'mv',
+    'video/music' => 'audio/music',
+    'audio/music' => 'video/music',
+);
+
+my $counterparts_re = join(
+    "|", map {quotemeta} sort {length($b) <=> length($a)} keys %counterparts);
+
+my $counterpart = $cwd;
+$counterpart =~ s!(?<=/)($counterparts_re)(/.+)?\z!$counterparts{$1} . $2!e;
+
+#print "D:counterpart=<$counterpart>\n";
+if ($counterpart ne $cwd && (-d $counterpart)) {
+    print $counterpart, "\n";
+} else {
+    print ".";
+}
