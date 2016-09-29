@@ -90,16 +90,16 @@ Suppose you are now in directory:
  /media/mv/en/c/celine-dion
 
 and you want to see Céline's French music videos
-(C</media/mv/fr/c/celine-dion>). If you use B<cd>:
+(C</media/mv/fr/c/celine-dion>). If you use B<cd>, the command will be:
 
  % cd ../../fr/c/celine-dion
 
-which is too much to type because you are recreating the structure. With
-B<cdpart>:
+which is too much to type because you are retyping the substructure. With
+B<cdpart> you just have to type:
 
  % cdpart fr
 
-What B<cdpart> will do is try the following in order:
+What B<cdpart> will do is try the following directories in order:
 
  /media/mv/en/c/fr
  /media/mv/en/fr/celine-dion
