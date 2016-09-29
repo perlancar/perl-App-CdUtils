@@ -37,8 +37,8 @@ To use in shell:
 
 =head1 DESCRIPTION
 
-`cdpart` will try to substitute a directory element with specified argument,
-starting from the deepest. `cdpart` is useful if you have some branches with
+B<cdpart> will try to substitute a directory element with specified argument,
+starting from the deepest. B<cdpart> is useful if you have some branches with
 identical structures and you want to move to another branch quickly.
 
 Suppose we have this directory structure:
@@ -80,36 +80,36 @@ Suppose we have this directory structure:
      ...
   ...
 
-You can see that the directories `mv` and `music` have the same structure: the
-first subdirectory level is language code (`en`, `fr`, ...), the second level is
-the first letter of artist's name (`a`, `b`, `c`, ...) and the third level is
-the name of the artist.
+You can see that the directories C<mv> and C<music> have the same structure: the
+first subdirectory level is language code (C<en>, C<fr>, ...), the second level
+is the first letter of artist's name (C<a>, C<b>, C<c>, ...) and the third level
+is the name of the artist.
 
 Suppose you are now in directory:
 
  /media/mv/en/c/celine-dion
 
-and you want to see Céline's French music videos (`/media/mv/fr/c/celine-dion`).
-If you use `cd`:
+and you want to see Céline's French music videos
+(C</media/mv/fr/c/celine-dion>). If you use B<cd>:
 
  % cd ../../fr/c/celine-dion
 
 which is too much to type because you are recreating the structure. With
-`cdpart`:
+B<cdpart>:
 
  % cdpart fr
 
-What `cdpart` will do is try the following in order:
+What B<cdpart> will do is try the following in order:
 
  /media/mv/en/c/fr
  /media/mv/en/fr/celine-dion
  /media/mv/fr/c/celine-dion
 
 The third succeeds so it goes there. If no match is found until the topmost
-directory, `cdpart` will not change directory.
+directory, B<cdpart> will not change directory.
 
 Another example:
 
  % cdpart music
 
-will eventually change the directory to `/media/music/fr/c/celine-dion`.
+will eventually change the directory to C</media/music/fr/c/celine-dion>.
