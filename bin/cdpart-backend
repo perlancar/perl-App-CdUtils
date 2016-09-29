@@ -1,34 +1,115 @@
 #!perl
 
-# misalnya gw ada di /media/1/mv/en/c/celine-dion
-# gw pengen berpindah dengan cepat ke /media/1/mv/fr/c/celine-dion
-# cdpart fr
-# dia akan pertama mencari /media/1/mv/en/c/fr
-# gak ada, maka ke /media/1/mv/en/fr/celine-dion
-# gak ada, maka ke /media/1/mv/fr/c/celine-dion
+# DATE
+# VERSION
 
+#IFUNBUILT
+use strict;
+use warnings;
+#END IFUNBUILT
 
-# to be called via 'cdmv', which is a shell alias: alias cdmv='cd
-# `cdmv-backend`'
+if (@ARGV != 1) { print ".\n"; exit }
 
 my $cwd = $ENV{PWD} || do { require Cwd; Cwd::cwd() };
+my @elems = split m!/+!, $cwd;
 
-my %counterparts = (
-    'mv' => 'm',
-    'm'  => 'mv',
-    'video/music' => 'audio/music',
-    'audio/music' => 'video/music',
-);
-
-my $counterparts_re = join(
-    "|", map {quotemeta} sort {length($b) <=> length($a)} keys %counterparts);
-
-my $counterpart = $cwd;
-$counterpart =~ s!(?<=/)($counterparts_re)(/.+)?\z!$counterparts{$1} . $2!e;
-
-#print "D:counterpart=<$counterpart>\n";
-if ($counterpart ne $cwd && (-d $counterpart)) {
-    print $counterpart, "\n";
-} else {
-    print ".";
+for my $i (reverse 0..$#elems) {
+    my @newelems = @elems; $newelems[$i] = $ARGV[0];
+    my $newpath = join "/", @newelems;
+    if (-d $newpath) { print "$newpath\n"; exit }
 }
+
+# no match
+print ".\n";
+
+# ABSTRACT: Change directory part
+# PODNAME:
+
+=head1 SYNOPSIS
+
+To use in shell:
+
+ % cdpart() { cd `cdpart-backend "$1"`; }
+
+ % cd /media/mv/en/c/celine-dion
+ % cdpart fr; # /media/mv/fr/c/celine-dion
+
+
+=head1 DESCRIPTION
+
+`cdpart` will try to substitute a directory element with specified argument,
+starting from the deepest. `cdpart` is useful if you have some branches with
+identical structures and you want to move to another branch quickly.
+
+Suppose we have this directory structure:
+
+ media/
+   mv/
+     en/
+       a/
+       b/
+       c/
+         carly-rae-japsen/
+         celine-dion/
+         charlie-puth/
+         ...
+       ...
+     fr/
+       a/
+       b/
+       c/
+         celine-dion/
+         christophe-willem/
+         ...
+     de/
+     ...
+   music/
+     en/
+       a/
+       b/
+       c/
+         celine-dion/
+         ...
+     fr/
+       a/
+       b/
+       c/
+         celine-dion/
+         ...
+       ...
+     ...
+  ...
+
+You can see that the directories `mv` and `music` have the same structure: the
+first subdirectory level is language code (`en`, `fr`, ...), the second level is
+the first letter of artist's name (`a`, `b`, `c`, ...) and the third level is
+the name of the artist.
+
+Suppose you are now in directory:
+
+ /media/mv/en/c/celine-dion
+
+and you want to see Céline's French music videos (`/media/mv/fr/c/celine-dion`).
+If you use `cd`:
+
+ % cd ../../fr/c/celine-dion
+
+which is too much to type because you are recreating the structure. With
+`cdpart`:
+
+ % cdpart fr
+
+What `cdpart` will do is try the following in order:
+
+ /media/mv/en/c/fr
+ /media/mv/en/fr/celine-dion
+ /media/mv/fr/c/celine-dion
+
+The third succeeds so it goes there. If no match is found until the topmost
+directory, `cdpart` will not change directory.
+
+Another example:
+
+ % cdpart music
+
+will eventually change the directory to `/media/music/fr/c/celine-dion`.
