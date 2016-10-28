@@ -148,3 +148,8 @@ will eventually change the directory to C</media/music/fr/c/celine-dion>.
 =head2 DEBUG => bool
 
 If set to true, will print the directories as they are tried.
+
+
+=head1 SEE ALSO
+
+L<cdpart-backend>
