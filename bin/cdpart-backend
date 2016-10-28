@@ -21,7 +21,7 @@ while (@elems >= 1) {
         my $newpath = join "/", @newelems;
         warn "cdpart: Trying $newpath\n" if $DEBUG;
         if (-d $newpath) {
-            print "cdpart: Found\n" if $DEBUG;
+            warn "cdpart: Found\n" if $DEBUG;
             print "$newpath\n";
             exit;
         }
