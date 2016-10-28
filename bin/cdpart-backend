@@ -8,18 +8,29 @@ use strict;
 use warnings;
 #END IFUNBUILT
 
+our $DEBUG = $ENV{DEBUG};
+
 if (@ARGV != 1) { print ".\n"; exit }
 
 my $cwd = $ENV{PWD} || do { require Cwd; Cwd::cwd() };
 my @elems = split m!/+!, $cwd;
 
-for my $i (reverse 0..$#elems) {
-    my @newelems = @elems; $newelems[$i] = $ARGV[0];
-    my $newpath = join "/", @newelems;
-    if (-d $newpath) { print "$newpath\n"; exit }
+while (@elems >= 1) {
+    for my $i (reverse 0..$#elems) {
+        my @newelems = @elems; $newelems[$i] = $ARGV[0];
+        my $newpath = join "/", @newelems;
+        warn "cdpart: Trying $newpath\n" if $DEBUG;
+        if (-d $newpath) {
+            print "cdpart: Found\n" if $DEBUG;
+            print "$newpath\n";
+            exit;
+        }
+    }
+    pop @elems;
 }
 
 # no match
+warn "cdpart: Can't find any match, giving up\n" if $DEBUG;
 print ".\n";
 
 # ABSTRACT: Change directory part
@@ -107,10 +118,33 @@ What B<cdpart> will do is try the following directories in order:
  /media/mv/fr/c/celine-dion
 
 The third succeeds so it goes there. If no match is found until the topmost
-directory, B<cdpart> will not change directory.
+directory, B<cdpart> will try these in order:
+
+ /media/mv/en/fr
+ /media/mv/fr/c
+ /media/fr/en/c
+ /fr/mv/en/c
+
+ /media/mv/fr
+ /media/fr/en
+ /fr/mv/en
+
+ /media/fr
+ /fr/mv
+
+ /fr
+
+If the last doesn't succeed too, B<cdpart> won't change directory.
 
 Another example:
 
  % cdpart music
 
 will eventually change the directory to C</media/music/fr/c/celine-dion>.
+
+
+=head1 ENVIRONMENT
+
+=head2 DEBUG => bool
+
+If set to true, will print the directories as they are tried.
