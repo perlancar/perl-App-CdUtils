@@ -1,0 +1,68 @@
+#!perl
+
+use strict;
+use warnings;
+
+use Path::Tiny;
+
+# AUTHORITY
+# DATE
+# DIST
+# VERSION
+
+our $DEBUG = $ENV{DEBUG};
+
+if (@ARGV != 1) { warn "Usage: cdtarget <symlink>\n"; print ".\n"; exit }
+
+my $target = readlink($ARGV[0]);
+unless (defined $target) { warn "cdtarget: $ARGV[0] not a symlink\n"; print ".\n"; exit }
+
+my $targetp = path($target);
+unless ($targetp->is_absolute) {
+    $targetp = $targetp->absolute( path($ARGV[0])->parent );
+}
+
+if ($targetp->is_dir) {
+    print "$targetp\n"; exit;
+} else {
+    print $targetp->parent, "\n"; exit;
+}
+
+# ABSTRACT: Change directory to symlink target's directory
+# PODNAME:
+
+=head1 SYNOPSIS
+
+To use in shell:
+
+ % cdtarget() { cd `cdtarget-backend "$1"`; }
+
+ % pwd
+ /tmp
+
+ % file p1todo p2
+ p1todo: symbolic link to /home/u1/Documents/project1/todo.txt
+ p2: symbolic link to /home/u1/Documents/project2
+
+ % cdtarget p1todo
+
+ % pwd
+ /home/u1/Documents/project1
+
+ % cdtarget p2
+
+ % pwd
+ /home/u1/Documents/project2
+
+
+=head1 DESCRIPTION
+
+B<cdtarget> is a command to change directory to a symlink target's directory. If
+the target is already a directory then it will be used directly, otherwise it's
+the target's directory that is used.
+
+
+=head1 ENVIRONMENT
+
+
+=head1 SEE ALSO

@@ -1,12 +1,12 @@
 #!perl
 
-# DATE
-# VERSION
-
-#IFUNBUILT
 use strict;
 use warnings;
-#END IFUNBUILT
+
+# AUTHORITY
+# DATE
+# DIST
+# VERSION
 
 our $DEBUG = $ENV{DEBUG};
 

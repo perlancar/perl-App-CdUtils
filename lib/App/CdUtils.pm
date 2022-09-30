@@ -1,13 +1,13 @@
 package App::CdUtils;
 
-# DATE
-# VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 
-#our %SPEC;
+# AUTHORITY
+# DATE
+# DIST
+# VERSION
 
 1;
 
