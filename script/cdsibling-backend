@@ -1,0 +1,104 @@
+#!perl
+
+use strict;
+use warnings;
+
+use Complete::Util qw(complete_array_elem hashify_answer);
+use Cwd qw(getcwd);
+use Getopt::Long::Complete qw(GetOptionsWithCompletion);
+
+# FRAGMENT id=shcompgen-hint completer=1 for=cdsibling
+
+# AUTHORITY
+# DATE
+# DIST
+# VERSION
+
+my $cwd = getcwd();
+my ($curname) = $cwd =~ m!/([^/]*)$!;
+
+GetOptionsWithCompletion(
+    sub {
+        my %args = @_;
+        my $type = $args{type};
+        my $word = $args{word};
+
+        if ($word eq '') {
+            my $res = hashify_answer(
+                complete_array_elem(
+                    word=>$word, array=>[$curname, "$curname "]),
+            );
+            $res->{final} = 1;
+            return $res;
+        } elsif ($type eq 'arg') {
+            my @dirs;
+            opendir my $dh, "..";
+            for my $e (readdir $dh) {
+                next if $e eq '.' || $e eq '..';
+                next unless -d "../$e";
+                push @dirs, $e;
+            }
+            return complete_array_elem(
+                word=>$word, array=>\@dirs);
+        }
+        undef;
+    },
+    'help|h' => sub {
+        print <<USAGE;
+Usage:
+  % cdsibling <dirname>
+Options:
+  --help, -h
+  --version, -v
+USAGE
+        exit 0;
+    },
+    'version|v' => sub {
+        no warnings 'once';
+        print "cdsibling version ", ($main::VERSION || "dev"), "\n";
+        exit 0;
+    },
+);
+die "Usage: cdsibling <dirname>\n" unless @ARGV == 1;
+
+$ARGV[0] = '' unless defined $ARGV[0];
+print "../$ARGV[0]\n";
+
+# ABSTRACT: Change to a sibling directory, with completion set to working directory
+# PODNAME:
+
+=head1 SYNOPSIS
+
+To use in shell:
+
+ % cdsibling() { cd `cdsibling-backend "$1"`; }
+
+A demonstration:
+
+ % ls
+ Foo-Bar
+ Foo-Baz
+ Foo-Qux
+
+ % cd Foo-Bar
+
+Case 1: tab completion when empty -> working directory so user can edit to cd to
+a sibling directory similar to working directory.
+
+ % cdsibling <tab>
+ % cdsibling Foo-Bar_
+ % cdsibling Foo-Baz          # user edits the command-line and type
+
+Case 2: tab completion when not empty -> from list of sibling directories.
+
+ % cdsibling Foo<tab>
+ Foo-Bar  Foo-Baz   Foo-Qux
+
+
+=head1 DESCRIPTION
+
+B<cdsibling> is a convenience command to use to change to a sibling directory.
+See SYNOPSIS for illustration on how it works.
+
+
+=head1 SEE ALSO
