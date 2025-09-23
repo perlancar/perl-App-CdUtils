@@ -110,7 +110,7 @@ To use in shell:
 
 =head1 DESCRIPTION
 
-B<cdprev> and C<cdnext> are commands to change to "previous" and "next" sibling
+B<cdprev> and B<cdnext> are commands to change to "previous" and "next" sibling
 directories, respectively. By default, asciibetical ordering is used. You can
 change the ordering by setting the L</CDPREVNEXT_SORT_FILES_OPTS> options, as
 L<sort-files> utility is used to sort the directories.
