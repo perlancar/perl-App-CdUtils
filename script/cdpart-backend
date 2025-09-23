@@ -28,7 +28,7 @@ GetOptionsWithCompletion(
         my $type = $args{type};
         my $word = $args{word};
 
-        return undef unless $type eq 'arg';
+        return undef unless $type eq 'arg'; ## no critic: Subroutines::ProhibitExplicitReturnUndef
         my @res;
 
         #for (reverse 1 .. $#cwd_elems) {

@@ -55,7 +55,7 @@ unless (@cwd_elems) {
 my @dirs;
 {
     local $CWD = "..";
-    open my $cmd, "sort-files $sort_files_opts |";
+    open my $cmd, "sort-files $sort_files_opts |"; ## no critic: InputOutput::ProhibitTwoArgOpen
     while (defined(my $e = <$cmd>)) {
         chomp $e;
         next unless -d $e;
