@@ -13,11 +13,12 @@ use Getopt::Long::Complete qw(GetOptionsWithCompletion);
 # DIST
 # VERSION
 
-# FRAGMENT id=shcompgen-hint completer=1 for=cdprev
+# FRAGMENT id=shcompgen-hint completer=1 for=cdprevsibling
 
 my $cwd = $ENV{PWD} || cwd();
 my @cwd_elems = split m!/+!, $cwd;
-my $sort_files_opts = $ENV{CDPREVNEXT_SORT_FILES_OPTS} // '--by-field=name';
+my $cmd = $0 =~ /cdprev/ ? 'cdprevsibling' : 'cdnextsibling';
+my $sort_files_opts = $ENV{CDPREVNEXTSIBLING_SORT_FILES_OPTS} // '--by-field=name';
 my %opts = (
     num => 1,
 );
@@ -29,7 +30,7 @@ GetOptionsWithCompletion(
     'help|h' => sub {
         print <<USAGE;
 Usage:
-  % cdprev [options]
+  % $cmd [options]
 Options:
   --help, -h
   --version, -v
@@ -39,7 +40,7 @@ USAGE
     },
     'version|v' => sub {
         no warnings 'once';
-        print "cdprev version ", ($main::VERSION || "dev"), "\n";
+        print "$cmd version ", ($main::VERSION || "dev"), "\n";
         exit 0;
     },
     'num|n=i' => \$opts{num},
@@ -55,8 +56,8 @@ unless (@cwd_elems) {
 my @dirs;
 {
     local $CWD = "..";
-    open my $cmd, "sort-files $sort_files_opts |"; ## no critic: InputOutput::ProhibitTwoArgOpen
-    while (defined(my $e = <$cmd>)) {
+    open my $fh, "sort-files $sort_files_opts |"; ## no critic: InputOutput::ProhibitTwoArgOpen
+    while (defined(my $e = <$fh>)) {
         chomp $e;
         next unless -d $e;
         push @dirs, $e;
@@ -72,20 +73,20 @@ for my $i (0 .. $#dirs) {
 }
 
 $curpos //= 0;
-my $newpos = $curpos + $opts{num} * ($0 =~ /prev-backend$/ ? -1 : 1);
+my $newpos = $curpos + $opts{num} * ($cmd eq 'cdprevsibling' ? -1 : 1);
 $newpos = 0 if $newpos < 0;
 $newpos = @dirs-1 if $newpos >= @dirs;
 print "../$dirs[$newpos]\n";
 
-# ABSTRACT: Change to the "previous" or "next" (sibling) directory
+# ABSTRACT: Change to the "previous" or "next" sibling directory
 # PODNAME:
 
 =head1 SYNOPSIS
 
 To use in shell:
 
- % cdprev() { cd `cdprev-backend "$1"`; }
- % cdnext() { cd `cdnext-backend "$1"`; }
+ % cdprevsibling() { cd `cdprevsibling-backend "$1"`; }
+ % cdnextsibling() { cd `cdnextsibling-backend "$1"`; }
 
  % pwd
  /some/path
@@ -95,25 +96,26 @@ To use in shell:
 
  % cd four
 
- % cdnext
+ % cdnextsibling
  % pwd
  /some/path/one
 
- % cdnext -n2
+ % cdnextsibling -n2
  % pwd
  /some/path/two
 
- % cdprev -n3
+ % cdprevsibling -n3
  % pwd
  /some/path/four
 
 
 =head1 DESCRIPTION
 
-B<cdprev> and B<cdnext> are commands to change to "previous" and "next" sibling
-directories, respectively. By default, asciibetical ordering is used. You can
-change the ordering by setting the L</CDPREVNEXT_SORT_FILES_OPTS> options, as
-L<sort-files> utility is used to sort the directories.
+B<cdprevsibling> and B<cdnextsibling> are commands to change to "previous" and
+"next" sibling directories, respectively. By default, asciibetical ordering is
+used. You can change the ordering by setting the
+L</CDPREVNEXTSIBLING_SORT_FILES_OPTS> options, as L<sort-files> utility is used
+to sort the directories.
 
 
 =head1 OPTIONS
@@ -125,7 +127,7 @@ Integer. Default 1.
 
 =head1 ENVIRONMENT
 
-=head2 CDPREVNEXT_SORT_FILES_OPTS
+=head2 CDPREVNEXTSIBLING_SORT_FILES_OPTS
 
 String. Options to pass to B<sort-files>. Default: C<--by-field name>.
 
