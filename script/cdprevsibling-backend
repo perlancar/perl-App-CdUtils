@@ -130,6 +130,31 @@ To use in shell:
  % pwd
  /some/path/four
 
+Changing sibling of grandparent (and upper) directory:
+
+ % tree
+ .
+ ├── A
+ │   ├── X0
+ │   ├── X1
+ │   │   └── Y
+ │   └── X2
+ └── B
+     ├── X0
+     ├── X1
+     │   └── Z
+     └── X2
+ 11 directories, 0 files
+
+ % cd A/X1
+ % cdnextsibling -l2
+ % pwd
+ /some/path/B/X1
+ % cd Z
+ % cdprevsibling -l3
+ % pwd
+ /some/path/A/X1        # (because A/X1/Z is not available)
+
 
 =head1 DESCRIPTION
 
