@@ -102,8 +102,8 @@ print join("/", @target_elems), "\n";
 
 To use in shell:
 
- % cdprevsibling() { cd `cdprevsibling-backend "$1"`; }
- % cdnextsibling() { cd `cdnextsibling-backend "$1"`; }
+ % cdprevsibling() { cd `cdprevsibling-backend "$@"`; }
+ % cdnextsibling() { cd `cdnextsibling-backend "$@"`; }
 
  % pwd
  /some/path
