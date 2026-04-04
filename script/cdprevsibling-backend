@@ -17,11 +17,12 @@ use Getopt::Long::Complete qw(GetOptionsWithCompletion);
 
 my $cwd = $ENV{PWD} || cwd();
 my @cwd_elems = split m!/+!, $cwd;
-my $cmd = $0 =~ /cdprev/ ? 'cdprevsibling' : 'cdnextsibling';
+my $cmd = $0 =~ /prev/ ? 'cdprevsibling' : 'cdnextsibling';
 my $sort_files_opts = $ENV{CDPREVNEXTSIBLING_SORT_FILES_OPTS} // '--by-field=name';
 my %opts = (
     num => 1,
     level => 1,
+    action => 'cd',
 );
 
 GetOptionsWithCompletion(
@@ -37,6 +38,7 @@ Options:
   --version, -v
   --num=i, -n
   --level=i, -l
+  --ls
 USAGE
         exit 0;
     },
@@ -47,6 +49,7 @@ USAGE
     },
     'num|n=i' => \$opts{num},
     'level|l=i' => \$opts{level},
+    'ls' => sub { $opts{action} = 'ls' },
 );
 
 die "$cmd: Level must be at least 1\n" if $opts{level} < 1;
@@ -77,6 +80,23 @@ for my $i (0 .. $#dirs) {
 }
 
 $curpos //= 0;
+
+if ($opts{action} eq 'ls') {
+    my $i = 0;
+    if ($cmd eq 'cdnextsibling') {
+        while ($curpos < @dirs) {
+            print "$i. $dirs[$curpos]\n";
+            $i++; $curpos++;
+        }
+    } else {
+        while ($curpos >= 0) {
+            print "$i. $dirs[$curpos]\n";
+            $i++; $curpos--;
+        }
+    }
+    exit 0;
+}
+
 my $newpos = $curpos + $opts{num} * ($cmd eq 'cdprevsibling' ? -1 : 1);
 $newpos = 0 if $newpos < 0;
 $newpos = @dirs-1 if $newpos >= @dirs;
@@ -104,6 +124,13 @@ To use in shell:
 
  % cdprevsibling() { cd `cdprevsibling-backend "$@"`; }
  % cdnextsibling() { cd `cdnextsibling-backend "$@"`; }
+
+ % lsprevsibling() { cdprevsibling-backend --ls "$@"; }
+ % lsnextsibling() { cdnextsibling-backend --ls "$@"; }
+
+(or define them in your shell startup file e.g. F<~/.bashrc>):
+
+Then:
 
  % pwd
  /some/path
@@ -155,6 +182,19 @@ Changing sibling of grandparent (and upper) directory:
  % pwd
  /some/path/A/X1        # (because A/X1/Z is not available)
 
+To see the list of previous/next siblings:
+
+ % pwd
+ A/X0
+ % lsprevsibling
+ 0. X0
+ 1. X1
+ 2. X2
+
+ % lsnextsibling -l2
+ 0. A
+ 1. B
+
 
 =head1 DESCRIPTION
 
@@ -200,6 +240,11 @@ same structure. In that case, this script will stop at the last depth where the
 same directory can be found. For example, if current position is C</A/X1/Y> and
 level is 3, next sibling should be C</B/X1/Y>. However, since the path does not
 exist, the script will return C</B/X1>.
+
+=head2 --ls
+
+List all the previous/next siblings (including current as number 0) instead of
+printing the target previous/next sibling.
 
 
 =head1 ENVIRONMENT
