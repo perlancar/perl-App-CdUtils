@@ -14,6 +14,13 @@ use Getopt::Long::Complete qw(GetOptionsWithCompletion);
 # VERSION
 
 # FRAGMENT id=shcompgen-hint completer=1 for=cdprevsibling
+# FRAGMENT id=shcompgen-hint completer=1 for=cdnextsibling
+
+# FRAGMENT id=shcompgen-hint completer=1 for=gdprevsibling
+# FRAGMENT id=shcompgen-hint completer=1 for=gdnextsibling
+
+# FRAGMENT id=shcompgen-hint completer=1 for=lsprevsibling
+# FRAGMENT id=shcompgen-hint completer=1 for=lsnextsibling
 
 my $cwd = $ENV{PWD} || cwd();
 my @cwd_elems = split m!/+!, $cwd;
@@ -139,6 +146,10 @@ To use in shell:
 
  % cdprevsibling() { cd `cdprevsibling-backend "$@"`; }
  % cdnextsibling() { cd `cdnextsibling-backend "$@"`; }
+
+ # gd is short for "get" directory
+ % gdprevsibling() { cdprevsibling-backend "$@"; }
+ % gdnextsibling() { cdnextsibling-backend "$@"; }
 
  % lsprevsibling() { cdprevsibling-backend --ls "$@"; }
  % lsnextsibling() { cdnextsibling-backend --ls "$@"; }
